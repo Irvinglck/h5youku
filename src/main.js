@@ -4,10 +4,13 @@ import Vue from 'vue'
 import App from './App'
 import router from './router'
 import axios from 'axios'
+import MintUI from 'mint-ui'
+import 'mint-ui/lib/style.css'
+import VideoPlayer from 'vue-video-player'
 Vue.prototype.$axios = axios;
 axios.defaults.baseURL = '/api'
+Vue.use(MintUI)
 
-import VideoPlayer from 'vue-video-player'
 require('vue-video-player/node_modules/video.js/dist/video-js.css')
 require('vue-video-player/src/custom-theme.css')
 Vue.use(VideoPlayer)

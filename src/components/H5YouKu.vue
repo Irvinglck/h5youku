@@ -2,7 +2,18 @@
   <div>
 
     <ul class="ul-pieces">
-      <li class="pieces-li">聊一下关于lck很帅这件小事</li>
+      <li class="pieces-li" @click="shareHandler()">
+        聊一下关于lck很帅这件小事
+        <mt-popup v-model="popupVisible" position="bottom" closeOnClickModal="false">
+          <Slot>
+            <span><img src="../../static/images/share/white/QQ好友.png"></span>
+            <span><img src="../../static/images/share/white/QQ空间.png"></span>
+            <span><img src="../../static/images/share/white/微信好友.png"></span>
+            <span><img src="../../static/images/share/white/微博.png"></span>
+            <span><img src="../../static/images/share/white/朋友圈.png"></span>
+          </Slot>
+        </mt-popup>
+      </li>
       <li  class="pieces-li pieces-li-list" v-for=" (item,index) in videoList " :key="index">
         <h1>
           <video-player class="video-player vjs-custom-skin"
@@ -26,11 +37,14 @@
 </template>
 
 <script>
+  import Vue from 'vue'
+  import { Popup } from 'mint-ui';
+  Vue.component(Popup.name, Popup);
   export default {
     name: "H5YouKu",
     data() {
       return {
-        msg: "一定可以",
+        popupVisible: false,
         playerOptions:[],
         videoList:[]
         // playerOptions: {
@@ -113,6 +127,10 @@
             videoPlayerList[i].player.pause();
           }
         }
+      },
+      //分享弹窗
+      shareHandler(){
+        this.popupVisible=!this.popupVisible;
       }
     },
     components: {},
