@@ -6,6 +6,7 @@ import router from './router'
 import axios from 'axios'
 import MintUI from 'mint-ui'
 import 'mint-ui/lib/style.css'
+
 import VideoPlayer from 'vue-video-player'
 Vue.prototype.$axios = axios;
 axios.defaults.baseURL = '/api'
