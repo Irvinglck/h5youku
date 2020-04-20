@@ -1,5 +1,6 @@
 <template>
   <div class="youku">
+<!--    <button @click="changeDake()">切换按钮</button>-->
     <ul class="ul-pieces">
       <li class="pieces-li" v-for=" (item,index) in videoList " :key="index">
         <div class="videoWrap">
@@ -45,6 +46,7 @@
   import Vue from 'vue'
   import {Popup} from 'mint-ui'
   import wx from 'weixin-js-sdk'
+  import darken from 'darken';
 
   Vue.component(Popup.name, Popup)
   export default {
@@ -58,7 +60,12 @@
         timestamp: '', // 必填，生成签名的时间戳
         nonceStr: '', // 必填，生成签名的随机串
         signature: '',// 必填，签名
+        temp:false
       }
+    },
+    created(){
+      //挂在方法提供ios使用
+      window.changeTheme=this.changeTheme;
     },
     mounted () {
       this.$axios.get('/api/advance/getVideoList?pageNum=1&pageSize=15')
@@ -105,6 +112,25 @@
         })
     },
     methods: {
+      // changeDake(){
+      //   this.temp=!this.temp;
+      //   this.changeTemp();
+      // },
+
+      changeTemp(flag){
+        const darkmode = new darken({
+          variables: {
+            "--sec-background-line" : ["#F7F8F9", "#3C3F41"],
+            "--sec-background-font" : ["rgba(1,1,1,1)", "rgba(255,255,255,1)"],
+            "--sec-background" : ["#F7F8F9", "#0C0C0C"],
+          }
+        });
+        if(flag===0){
+          darkmode.on()
+        }else{
+          darkmode.off()
+        }
+      },
       //只允许播放一个视频
       onPlayerPlay (player, index) {
         let videoPlayerList = this.$refs.videoPlayer
@@ -114,10 +140,13 @@
           }
         }
       },
+      //黑白切换
+      changeTheme(flag){
+          this.changeTemp(flag);
+      },
       //分享弹窗
       shareHandler (item) {
         alert(JSON.stringify(item))
-        // item.videoUrl,item.thumbnail,item.title,item.videoName
         let u = navigator.userAgent
         const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
         if (isiOS) {
@@ -128,7 +157,6 @@
       },
       shareUtils1 (item) {
         this.popupVisible = false
-        console.log('item----------------->', item)
         wx.checkJsApi({
           jsApiList: ['updateTimelineShareData', 'updateAppMessageShareData'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
           success: function (res) {
@@ -313,9 +341,13 @@
     border: none;
     outline: none;
   }
+  .ul-pieces{
+    background: var(--sec-background);
+  }
 
   .pieces-li {
-    border-bottom: 5px solid #ececec;
+    /*border-bottom: 5px solid #ececec;*/
+    border-bottom: 5px solid var(--sec-background-line);
     padding: 0 15px;
   }
 
@@ -339,6 +371,7 @@
 
   .titleWrap .list-des {
     line-height: 20px;
+    color: var(--sec-background-font);
   }
 
   .titleWrap .list-des em {

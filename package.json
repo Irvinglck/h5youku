@@ -16,6 +16,7 @@
   "dependencies": {
     "assets": "^3.0.1",
     "axios": "^0.19.2",
+    "darken": "^1.5.0",
     "m-share": "^1.0.2",
     "mint-ui": "^2.2.13",
     "reset.css": "^2.0.2",
