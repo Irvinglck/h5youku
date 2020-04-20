@@ -15,28 +15,28 @@
             <em>[伴你无碍]</em><span class="list-des-content">{{item.videoName}}</span>
           </p>
           <span class="list-des-points">
-            <img @click="shareHandler()" src="../../static/images/share.png">
+            <img @click="shareHandler(item)" src="../../static/images/share.png">
           </span>
         </div>
       </li>
     </ul>
-    <mt-popup class="popup-alter" v-model="popupVisible" position="bottom" closeOnClickModal="false"
-              v-show="popupVisible">
-      <Slot class="icon-share-slot">
-        <div class="slot-title">分享</div>
-        <div class="slot-list">
-          <div class="slot-li">
-            <img class="slot-li-img" @click="shareUtils(item)"
-                                     src="../../static/images/share/white/微信好友.png">
-          </div>
-          <div class="slot-li">
-            <img class="slot-li-img" @click="shareUtils(item)"
-                                     src="../../static/images/share/white/朋友圈.png">
-          </div>
-        </div>
-        <div class="slot-cancel" @click="shareHandler()">取消</div>
-      </Slot>
-    </mt-popup>
+<!--    <mt-popup class="popup-alter" v-model="popupVisible" position="bottom" closeOnClickModal="false"-->
+<!--              v-show="popupVisible">-->
+<!--      <Slot class="icon-share-slot">-->
+<!--        <div class="slot-title">分享</div>-->
+<!--        <div class="slot-list">-->
+<!--          <div class="slot-li">-->
+<!--            <img class="slot-li-img" @click="shareUtils(item)"-->
+<!--                 src="../../static/images/share/white/微信好友.png">-->
+<!--          </div>-->
+<!--          <div class="slot-li">-->
+<!--            <img class="slot-li-img" @click="shareUtils(item)"-->
+<!--                 src="../../static/images/share/white/朋友圈.png">-->
+<!--          </div>-->
+<!--        </div>-->
+<!--        <div class="slot-cancel" @click="shareHandler()">取消</div>-->
+<!--      </Slot>-->
+<!--    </mt-popup>-->
   </div>
 
 </template>
@@ -61,7 +61,7 @@
       }
     },
     mounted () {
-      this.$axios.get('/api/advance/getVideoList?pageNum=1&pageSize=10')
+      this.$axios.get('/api/advance/getVideoList?pageNum=1&pageSize=15')
         .then(resp => {
           console.log('location.href.split(\'#\')[0]----->', location.href.split('#')[0])
           console.log(resp)
@@ -115,16 +115,24 @@
         }
       },
       //分享弹窗
-      shareHandler () {
-        this.popupVisible = !this.popupVisible
+      shareHandler (item) {
+        alert(JSON.stringify(item))
+        // item.videoUrl,item.thumbnail,item.title,item.videoName
+        let u = navigator.userAgent
+        const isiOS = !!u.match(/\(i[^;]+;( U;)? CPU.+Mac OS X/)
+        if (isiOS) {
+          window.webkit.messageHandlers.sharewx.postMessage({"videoUrl":item.videoUrl,"thumbnail":item.thumbnail,"title":item.title,"videoName":item.videoName})
+        } else {
+          window.aj.runOnAndroidJavaScript(item.videoUrl,item.thumbnail,item.title,item.videoName)
+        }
       },
-      shareUtils (item) {
+      shareUtils1 (item) {
         this.popupVisible = false
         console.log('item----------------->', item)
         wx.checkJsApi({
-          jsApiList: ['updateTimelineShareData','updateAppMessageShareData'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
-          success: function(res) {
-            alert('检测客户端版本是否支持指定JS接口'+JSON.stringify(res));
+          jsApiList: ['updateTimelineShareData', 'updateAppMessageShareData'], // 需要检测的JS接口列表，所有JS接口列表见附录2,
+          success: function (res) {
+            alert('检测客户端版本是否支持指定JS接口' + JSON.stringify(res))
           }
         })
         this.$axios.get('/api/advance/getSignature?url=' + location.href.split('#')[0])
@@ -177,12 +185,12 @@
                 })
               })
               wx.error((res) => {
-                alert('通过error接口处理失败验证------>'+res)
+                alert('通过error接口处理失败验证------>' + res)
               })
 
             }
           }).catch(error => {
-           alert('后台getSignature获取签名失败'+JSON.stringify(error))
+          alert('后台getSignature获取签名失败' + JSON.stringify(error))
         })
       }
     },
@@ -190,107 +198,195 @@
   }
 </script>
 
-<style scoped >
+<style scoped>
   html * {
     outline: 0;
     -webkit-text-size-adjust: none;
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
   }
-  body{
+
+  body {
     font-size: 12px;
-    font-family:'Avenir,Microsoft YaHei','Helvetica','Simsun';
+    font-family: 'Avenir,Microsoft YaHei', 'Helvetica', 'Simsun';
     background: #fff;
     color: #383E43;
     -moz-user-select: none;
     -ms-user-select: none;
     -webkit-user-select: none;
   }
-  a,abbr,acronym,address,applet,article,aside,audio,b,big,blockquote,body,
-  canvas,caption,center,cite,code,dd,del,details,dfn,div,dl,dt,em,embed,
-  fieldset,figcaption,
-  figure,footer,form,h1,h2,h3,h4,h5,h6,header,hgroup,html,i,
-  iframe,img,ins,kbd,label,legend,li,mark,menu,nav,object,ol,output,
-  p,pre,q,ruby,s,samp,section,small,span,strike,strong,sub,summary,
-  table,tbody,td,tfoot,th,thead,time,tr,tt,u,ul,var,
-  video,input,textarea{
-    margin:0;
-    padding:0;
-    border:0;
-    vertical-align:baseline;
-    word-wrap:break-word;
+
+  a, abbr, acronym, address, applet, article, aside, audio, b, big, blockquote, body,
+  canvas, caption, center, cite, code, dd, del, details, dfn, div, dl, dt, em, embed,
+  fieldset, figcaption,
+  figure, footer, form, h1, h2, h3, h4, h5, h6, header, hgroup, html, i,
+  iframe, img, ins, kbd, label, legend, li, mark, menu, nav, object, ol, output,
+  p, pre, q, ruby, s, samp, section, small, span, strike, strong, sub, summary,
+  table, tbody, td, tfoot, th, thead, time, tr, tt, u, ul, var,
+  video, input, textarea {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    vertical-align: baseline;
+    word-wrap: break-word;
     background: transparent;
   }
-  button,input,select,textarea{
-    outline:none;
+
+  button, input, select, textarea {
+    outline: none;
     border: none;
     background: none;
   }
-  textarea{
-    resize:none;
+
+  textarea {
+    resize: none;
   }
-  article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section{display:block}
-  li,ol,ul{list-style:none;}
-  blockquote,q{quotes:none;}
-  blockquote:after,blockquote:before,q:after,q:before{content:'';content:none;}
-  b,strong{font-weight:700;}
-  i,em{font-style: normal;}
-  img{
-    vertical-align:middle;
-    border:none;
+
+  article, aside, details, figcaption, figure, footer, header, hgroup, menu, nav, section {
+    display: block
   }
-  h1,h2,h3,h4,h5,h6{
+
+  li, ol, ul {
+    list-style: none;
+  }
+
+  blockquote, q {
+    quotes: none;
+  }
+
+  blockquote:after, blockquote:before, q:after, q:before {
+    content: '';
+    content: none;
+  }
+
+  b, strong {
+    font-weight: 700;
+  }
+
+  i, em {
+    font-style: normal;
+  }
+
+  img {
+    vertical-align: middle;
+    border: none;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
     font-weight: normal;
     font-size: 100%;
     line-height: 100%;
   }
 
-  p{
+  p {
     font-size: 100%;
     line-height: 100%;
   }
-  a{ color:#383E43;
-    text-decoration:none;
+
+  a {
+    color: #383E43;
+    text-decoration: none;
     outline: none;
   }
-  a:focus {outline: none;}
-  a:active{border: none;}
+
+  a:focus {
+    outline: none;
+  }
+
+  a:active {
+    border: none;
+  }
 
   /*清浮动*/
-  .clearfix:after{
+  .clearfix:after {
     content: "";
     display: block;
     clear: both;
     height: 0;
   }
-  .clearfix{
-    zoom:1;
+
+  .clearfix {
+    zoom: 1;
   }
-  a:link,a:hover,a:active,a:visited{text-decoration: none;border: none;outline: none;}
 
-  .pieces-li{border-bottom: 5px solid #ececec;padding: 0 15px;}
-  .videoWrap{height: 194px;width: 100%;margin-top: 15px;}
-  .titleWrap{font-size: 16px;font-weight: bold;color: #010101;font-family:PingFang-SC;
-          position: relative;height: 40px;text-align: left;margin: 10px 0 13px;letter-spacing:2px;}
-  .titleWrap .list-des{line-height: 20px;}
-  .titleWrap .list-des em{padding-right: 9px;}
-  .titleWrap .list-des-points{position: absolute;right: 0;bottom: 0; }
-  .titleWrap .list-des-points img{width: 3px;height: 15px;}
-  .popup-alter{width: 100%;background: #fff;text-align: center;}
-  .slot-title,.slot-cancel{line-height: 44px;font-size: 15px;color: #010101;border-bottom: 1px solid #F0EFF5;}
-  .slot-list{display: flex;justify-content: center;margin: 20px 0;}
-  .slot-list .slot-li{flex: 1;}
-  .slot-list img{width: 45px;height: 45px;}
-  .slot-cancel{border-bottom: none;}
+  a:link, a:hover, a:active, a:visited {
+    text-decoration: none;
+    border: none;
+    outline: none;
+  }
 
+  .pieces-li {
+    border-bottom: 5px solid #ececec;
+    padding: 0 15px;
+  }
 
+  .videoWrap {
+    height: 194px;
+    width: 100%;
+    margin-top: 15px;
+  }
 
+  .titleWrap {
+    font-size: 16px;
+    font-weight: bold;
+    color: #010101;
+    font-family: PingFang-SC;
+    position: relative;
+    height: 40px;
+    text-align: left;
+    margin: 10px 0 13px;
+    letter-spacing: 2px;
+  }
 
+  .titleWrap .list-des {
+    line-height: 20px;
+  }
 
+  .titleWrap .list-des em {
+    padding-right: 9px;
+  }
 
+  .titleWrap .list-des-points {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+  }
 
+  .titleWrap .list-des-points img {
+    width: 3px;
+    height: 15px;
+  }
 
+  .popup-alter {
+    width: 100%;
+    background: #fff;
+    text-align: center;
+  }
 
+  .slot-title, .slot-cancel {
+    line-height: 44px;
+    font-size: 15px;
+    color: #010101;
+    border-bottom: 1px solid #F0EFF5;
+  }
 
+  .slot-list {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0;
+  }
+
+  .slot-list .slot-li {
+    flex: 1;
+  }
+
+  .slot-list img {
+    width: 45px;
+    height: 45px;
+  }
+
+  .slot-cancel {
+    border-bottom: none;
+  }
 
 
 </style>

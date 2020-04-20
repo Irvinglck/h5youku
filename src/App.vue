@@ -1,6 +1,7 @@
 <template>
   <div id="app">
     <!--<img src="./assets/logo.png">-->
+    <title>伴你无碍</title>
     <router-view/>
   </div>
 </template>
