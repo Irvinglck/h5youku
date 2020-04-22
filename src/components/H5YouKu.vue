@@ -9,6 +9,7 @@
                         :playsinline="true"
                         :options="playerOptions[index]"
                         @play="onPlayerPlay($event,index)"
+
           ></video-player>
         </div>
         <div class="titleWrap">
@@ -60,24 +61,24 @@
         timestamp: '', // 必填，生成签名的时间戳
         nonceStr: '', // 必填，生成签名的随机串
         signature: '',// 必填，签名
-        temp:false
+        temp:false,
       }
     },
     created(){
       //挂在方法提供ios使用
       window.changeTheme=this.changeTheme;
+      window.stopVideo=this.stopVideo;
     },
     mounted () {
-      this.$axios.get('/api/advance/getVideoList?pageNum=1&pageSize=15')
+      this.$axios.get('/api/advance/getVideoList?pageNum=1&pageSize=20')
         .then(resp => {
-          console.log('location.href.split(\'#\')[0]----->', location.href.split('#')[0])
           console.log(resp)
           if (resp.data.code === 200) {
             this.videoList = resp.data.data
             console.log('this.videoList-----', this.videoList)
             for (let i = 0; i < this.videoList.length; i++) {
               let arrStr = {
-                playbackRates: [0.7, 1.0, 1.5, 2.0], //播放速度
+                playbackRates: [], //播放速度0.7, 1.0, 1.5, 2.0
                 autoplay: false, //如果true,浏览器准备好时开始回放。
                 muted: false, // 默认情况下将会消除任何音频。
                 loop: false, // 导致视频一结束就重新开始。
@@ -88,7 +89,6 @@
                 sources: [{
                   type: 'video/mp4',//这里的种类支持很多种：基本视频格式、直播、流媒体等，具体可以参看git网址项目
                   src: this.videoList[i].videoUrl,
-                  // src: "https://oss-jz.oss-cn-beijing.aliyuncs.com/bn2c/video/h5visual/banni.mp4"
                   // src: "http://1255423799.vod2.myqcloud.com/36c90d91vodcq1255423799/ac94ac665285890800080406198/7aGEzFsIRDwA.mp4"
                 }
                 ],
@@ -97,10 +97,10 @@
                 width: document.documentElement.clientWidth, //播放器宽度
                 notSupportedMessage: '此视频暂无法播放，请稍后再试', //允许覆盖Video.js无法播放媒体源时显示的默认信息。
                 controlBar: {
-                  timeDivider: true,
-                  durationDisplay: true,
-                  remainingTimeDisplay: false,
-                  fullscreenToggle: true  //全屏按钮
+                  timeDivider: true,//true
+                  durationDisplay: true,//true
+                  remainingTimeDisplay: false,//false
+                  fullscreenToggle: true  //全屏按钮true
                 }
               }
               this.playerOptions.push(arrStr)
@@ -111,25 +111,17 @@
           console.log(error)
         })
     },
+    // destroyed(){
+      // window.removeEventListener('scroll', this.load, false);
+      // window.removeEventListener('webkitvisibilitychange', e => this.beforeunloadFn(e))
+    // },
     methods: {
-      // changeDake(){
-      //   this.temp=!this.temp;
-      //   this.changeTemp();
-      // },
-
-      changeTemp(flag){
-        const darkmode = new darken({
-          variables: {
-            "--sec-background-line" : ["#F7F8F9", "#3C3F41"],
-            "--sec-background-font" : ["rgba(1,1,1,1)", "rgba(255,255,255,1)"],
-            "--sec-background" : ["#F7F8F9", "#0C0C0C"],
-          }
-        });
-        if(flag===0){
-          darkmode.on()
-        }else{
-          darkmode.off()
+      stopVideo(){
+        let videoPlayerList = this.$refs.videoPlayer;
+        for (let i = 0; i < videoPlayerList.length; i++) {
+          videoPlayerList[i].player.pause()
         }
+        return videoPlayerList.length;
       },
       //只允许播放一个视频
       onPlayerPlay (player, index) {
@@ -143,6 +135,20 @@
       //黑白切换
       changeTheme(flag){
           this.changeTemp(flag);
+      },
+      changeTemp(flag){
+        const darkmode = new darken({
+          variables: {
+            "--sec-background-line" : ["#F7F8F9", "#3C3F41"],
+            "--sec-background-font" : ["rgba(1,1,1,1)", "rgba(255,255,255,1)"],
+            "--sec-background" : ["#F7F8F9", "#0C0C0C"],
+          }
+        });
+        if(flag===1){
+          darkmode.on()
+        }else
+          darkmode.off()
+
       },
       //分享弹窗
       shareHandler (item) {
