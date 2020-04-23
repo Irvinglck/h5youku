@@ -110,12 +110,27 @@
         .catch(error => {
           console.log(error)
         })
+      //window.onscroll监听事件如何在页面离开时关闭
+      // window.addEventListener('scroll', this.load)
+      // window.addEventListener('scroll',()=>{
+        // let scrollTop=document.documentElement.scrollTop||document.body.scrollTop ||document.querySelector('.element').scrollTop;
+        // this.pageScroll()
+        // console.log(scrollTop);
+      // },true)
     },
-    // destroyed(){
-      // window.removeEventListener('scroll', this.load, false);
+    destroyed(){
+      // window.removeEventListener('scroll', this.load);
+      //浏览器切换
       // window.removeEventListener('webkitvisibilitychange', e => this.beforeunloadFn(e))
-    // },
+    },
     methods: {
+      pageScroll(){
+        let videoPlayerList = this.$refs.videoPlayer;
+        for (let i = 0; i < videoPlayerList.length; i++) {
+          videoPlayerList[i].player.pause()
+        }
+      },
+      //ios暂停
       stopVideo(){
         let videoPlayerList = this.$refs.videoPlayer;
         for (let i = 0; i < videoPlayerList.length; i++) {
